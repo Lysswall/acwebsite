@@ -17,7 +17,7 @@ author = "Allyssa Curry"
 description = "Allyssa Curry's personal website"
 keywords = "blog,developer,personal"
 info = ["Machine Learning Enthusiast", "Business analaytics"]
-avatarURL = "images/photo.jpg"
+avatarURL = "images/siuc.png"
 #gravatar = "john.doe@example.com"
 dateFormat = "January 2, 2006"
 since = 2019
@@ -196,3 +196,8 @@ url = "projects/"
 name = "Contato"
 weight = 5
 url = "contact/"
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
