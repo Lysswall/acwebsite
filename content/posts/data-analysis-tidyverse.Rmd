@@ -1,0 +1,153 @@
+---
+title: "Data Analysis Using Tidyverse"
+author: "Allyssa Curry"
+date: "2023-03-07"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+ Load and install
+```{r}
+pacman::p_load(
+  tidyverse,
+  janitor,
+  lubridate
+)
+```
+
+Renaming the data set,converting into a tibble, and make all columns uppercase
+```{r}
+product <- read_csv(
+"https://raw.githubusercontent.com/msharifbd/DATA/main/DATA.csv"
+)%>%
+clean_names()%>%
+rename_all(toupper)
+untidy_data <- tibble(product)
+df = as_tibble(untidy_data)
+is_tibble(df)
+```
+Question 2
+In the metadata there are 6,910 rows and 14 columns. The variables are companyname,stateincorp,ticker,year,sic,totalassets,costofgoodssold,netincome,sale,advertising,sellingadmin,mktvalue,commonequity,and totalliability.
+```{r}
+df = df %>%
+   mutate(SIC = as.character(SIC))
+glimpse(df)
+```
+Question 3
+There are 691 companies, this dataset has information over the duration of 10 years, and there are 234 industries.
+```{r}
+df %>% 
+  count(COMPANYNAME)
+df %>% 
+  count(YEAR)
+df %>% 
+  count(SIC)
+df %>%
+  count(SIC,sort = TRUE)
+top_5_industries= df %>% 
+  filter(
+    SIC==c("7370","5812","7372","2834","3845")
+  )
+glimpse(top_5_industries)
+ggplot(x=top_5_industries$SIC,y=top_5_industries$COMPANYNAME)+
+geom_bar(stat = "identity")+
+labs(x = "SIC",
+y = "Companies",
+title = "Top 5 Industries"
+)
+```
+Question 4
+The dataset for alphabet inc shows that its located in Delaware,ticker is google, total assets,COGS,NI,sales,market value,common equity, and total liability increased over the years. After making the scatter plot i found how that the sales and net income of the google dataset has a linear relationship with one outlier.
+```{r}
+GOOGL=df %>%
+  filter(
+    COMPANYNAME == "ALPHABET INC"
+  )
+glimpse(GOOGL)
+plot(GOOGL$SALE,GOOGL$NETINCOME,pch=16,col=("red"))
+  
+```
+Question 5
+Target and walmart netincome and sales doesnt have a relationship. Target looks to be more static in their NI and walmart seems to fluctuate no matter what their sales and NI are in the years of 2008 to 2017. Walmart does keep a higher income over the years compared to 2008.
+```{r}
+Target_dataset = df %>% 
+  filter(
+    COMPANYNAME == ("TARGET CORP") 
+  )
+glimpse(Target_dataset)
+plot(Target_dataset$SALE,Target_dataset$NETINCOME,pch=16,col=("red"))
+Walmart_dataset = df %>% 
+  filter(
+    COMPANYNAME==("WALMART INC") 
+  )
+glimpse(Walmart_dataset)
+plot(Walmart_dataset$SALE,Walmart_dataset$NETINCOME,pch=16,col=("blue"))
+
+```
+Question 6
+1-800-flowers.com has the highest ROA
+```{r}
+GROSSPROFIT<-df$SALE-df$COSTOFGOODSSOLD
+ROA<-df$NETINCOME/df$TOTALASSETS
+ROE<-df$NETINCOME/df$COMMONEQUITY
+GPMARGIN<-GROSSPROFIT/df$SALE
+NPMARGIN<-df$NETINCOME/df$SALE
+company_2008=df %>% 
+  filter(
+    YEAR == "2008"
+  )
+glimpse(company_2008)
+company_2008 %>% 
+  group_by(COMPANYNAME) %>% 
+  reframe(ROA) %>% 
+  arrange(ROA)
+```
+Question 7
+The top 3 companies that have the highest Net profits are Alaska Air Group Inc, ALLEGIANT TRAVEL CO, and AMERICAN AIRLINES GROUP INC. 
+```{r}
+transportation_dataset= df %>% 
+  filter(
+    SIC==("4512") 
+  )
+glimpse(transportation_dataset)
+transportation_dataset %>% 
+  group_by(COMPANYNAME) %>% 
+  reframe(NPMARGIN) %>% 
+  arrange(NPMARGIN)
+```
+Question 8
+The mean of total assets is higher than the mean of sales in pfizer inc and johnson & johnson. These boxplots show pfizer inc having a higher avg of total assets than johnson & johnson company. On the other hand, johnson & johnson has a higher sales avg compared to pfizer inc.
+```{r}
+boxplot_data=df %>% 
+  filter(
+    COMPANYNAME==c("PFIZER INC","JOHNSON & JOHNSON" ) 
+  )
+pfizer_box=df %>% 
+  filter(
+    COMPANYNAME==("PFIZER INC") 
+  )
+johnson_box=df %>% 
+  filter(
+    COMPANYNAME==("JOHNSON & JOHNSON") 
+  )
+boxplot.default(pfizer_box$TOTALASSETS,pfizer_box$SALE)
+boxplot.default(johnson_box$TOTALASSETS,johnson_box$SALE)
+glimpse(boxplot_data)
+boxplot(boxplot_data$TOTALASSETS,boxplot_data$SALE)
+```
+Question 9
+Theres no reltionship between the advertising expenses and the sales. There are a few outliers, but overall the more thats spent on advertising does not affect the companies sales.
+```{r}
+plot.default(df$ADVERTISING,df$SALE,pch=16,col=("blue"))
+plot.default(df$SALE,df$ADVERTISING,pch=16,col=("blue"))
+```
+Question 10
+Delaware has the most amount of companies
+```{r}
+df %>%
+  count(STATEINCORP,sort = TRUE)
+```
+

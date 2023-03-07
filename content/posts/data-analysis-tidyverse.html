@@ -1,0 +1,368 @@
+---
+title: "Data Analysis Using Tidyverse"
+author: "Allyssa Curry"
+date: "2023-03-07"
+output: html_document
+---
+
+
+
+<p>Load and install</p>
+<pre class="r"><code>pacman::p_load(
+  tidyverse,
+  janitor,
+  lubridate
+)</code></pre>
+<p>Renaming the data set,converting into a tibble, and make all columns uppercase</p>
+<pre class="r"><code>product &lt;- read_csv(
+&quot;https://raw.githubusercontent.com/msharifbd/DATA/main/DATA.csv&quot;
+)%&gt;%
+clean_names()%&gt;%
+rename_all(toupper)</code></pre>
+<pre><code>## Rows: 6910 Columns: 14
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (3): companyname, stateincorp, ticker
+## dbl (11): year, sic, totalassets, costofgoodssold, netincome, sale, advertis...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>untidy_data &lt;- tibble(product)
+df = as_tibble(untidy_data)
+is_tibble(df)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<p>Question 2
+In the metadata there are 6,910 rows and 14 columns. The variables are companyname,stateincorp,ticker,year,sic,totalassets,costofgoodssold,netincome,sale,advertising,sellingadmin,mktvalue,commonequity,and totalliability.</p>
+<pre class="r"><code>df = df %&gt;%
+   mutate(SIC = as.character(SIC))
+glimpse(df)</code></pre>
+<pre><code>## Rows: 6,910
+## Columns: 14
+## $ COMPANYNAME     &lt;chr&gt; &quot;AMERICAN AIRLINES GROUP INC&quot;, &quot;AMERICAN AIRLINES GROU…
+## $ STATEINCORP     &lt;chr&gt; &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, …
+## $ TICKER          &lt;chr&gt; &quot;AAL&quot;, &quot;AAL&quot;, &quot;AAL&quot;, &quot;AAL&quot;, &quot;AAL&quot;, &quot;AAL&quot;, &quot;AAL&quot;, &quot;AAL&quot;…
+## $ YEAR            &lt;dbl&gt; 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, …
+## $ SIC             &lt;chr&gt; &quot;4512&quot;, &quot;4512&quot;, &quot;4512&quot;, &quot;4512&quot;, &quot;4512&quot;, &quot;4512&quot;, &quot;4512&quot;…
+## $ TOTALASSETS     &lt;dbl&gt; 25175.000, 25438.000, 25088.000, 23848.000, 23510.000,…
+## $ COSTOFGOODSSOLD &lt;dbl&gt; 20232.000, 16935.000, 18138.000, 20420.000, 20529.000,…
+## $ NETINCOME       &lt;dbl&gt; -2071.000, -1468.000, -471.000, -1979.000, -1876.000, …
+## $ SALE            &lt;dbl&gt; 23766.000, 19917.000, 22170.000, 24022.000, 24855.000,…
+## $ ADVERTISING     &lt;dbl&gt; 153.000, 153.000, 165.000, 186.000, 153.000, 166.000, …
+## $ SELLINGADMIN    &lt;dbl&gt; 3024.000, 2720.000, 2729.000, 2907.000, 2892.000, 4672…
+## $ MKTVALUE        &lt;dbl&gt; 2976.3858, 2571.1835, 2597.5755, 117.3438, 266.5571, 6…
+## $ COMMONEQUITY    &lt;dbl&gt; -2935.000, -3489.000, -3945.000, -7111.000, -7987.000,…
+## $ TOTALLIABILITY  &lt;dbl&gt; 28110.000, 28927.000, 29033.000, 30959.000, 31497.000,…</code></pre>
+<p>Question 3
+There are 691 companies, this dataset has information over the duration of 10 years, and there are 234 industries.</p>
+<pre class="r"><code>df %&gt;% 
+  count(COMPANYNAME)</code></pre>
+<pre><code>## # A tibble: 691 × 2
+##    COMPANYNAME                      n
+##    &lt;chr&gt;                        &lt;int&gt;
+##  1 1-800-FLOWERS.COM               10
+##  2 3D SYSTEMS CORP                 10
+##  3 3M CO                           10
+##  4 8X8 INC                         10
+##  5 A V HOMES INC                   10
+##  6 AAON INC                        10
+##  7 ABAXIS INC                      10
+##  8 ACACIA DIVERSIFIED HLDGS INC    10
+##  9 ACCO BRANDS CORP                10
+## 10 ACCURAY INC                     10
+## # … with 681 more rows</code></pre>
+<pre class="r"><code>df %&gt;% 
+  count(YEAR)</code></pre>
+<pre><code>## # A tibble: 10 × 2
+##     YEAR     n
+##    &lt;dbl&gt; &lt;int&gt;
+##  1  2008   691
+##  2  2009   691
+##  3  2010   691
+##  4  2011   691
+##  5  2012   691
+##  6  2013   691
+##  7  2014   691
+##  8  2015   691
+##  9  2016   691
+## 10  2017   691</code></pre>
+<pre class="r"><code>df %&gt;% 
+  count(SIC)</code></pre>
+<pre><code>## # A tibble: 234 × 2
+##    SIC       n
+##    &lt;chr&gt; &lt;int&gt;
+##  1 100      20
+##  2 1382     10
+##  3 1389     10
+##  4 1531     90
+##  5 1623     10
+##  6 200      10
+##  7 2000     20
+##  8 2011     20
+##  9 2013     30
+## 10 2015     10
+## # … with 224 more rows</code></pre>
+<pre class="r"><code>df %&gt;%
+  count(SIC,sort = TRUE)</code></pre>
+<pre><code>## # A tibble: 234 × 2
+##    SIC       n
+##    &lt;chr&gt; &lt;int&gt;
+##  1 7370    390
+##  2 5812    280
+##  3 7372    280
+##  4 2834    160
+##  5 3845    130
+##  6 3674    120
+##  7 5500    110
+##  8 5651    110
+##  9 7990    110
+## 10 2300    100
+## # … with 224 more rows</code></pre>
+<pre class="r"><code>top_5_industries= df %&gt;% 
+  filter(
+    SIC==c(&quot;7370&quot;,&quot;5812&quot;,&quot;7372&quot;,&quot;2834&quot;,&quot;3845&quot;)
+  )
+glimpse(top_5_industries)</code></pre>
+<pre><code>## Rows: 248
+## Columns: 14
+## $ COMPANYNAME     &lt;chr&gt; &quot;AMERICAN SOFTWARE  -CL A&quot;, &quot;AMERICAN SOFTWARE  -CL A&quot;…
+## $ STATEINCORP     &lt;chr&gt; &quot;GA&quot;, &quot;GA&quot;, &quot;DE&quot;, &quot;DE&quot;, &quot;FL&quot;, &quot;FL&quot;, &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, …
+## $ TICKER          &lt;chr&gt; &quot;AMSWA&quot;, &quot;AMSWA&quot;, &quot;ADSK&quot;, &quot;ADSK&quot;, &quot;NIMU&quot;, &quot;NIMU&quot;, &quot;BMY…
+## $ YEAR            &lt;dbl&gt; 2010, 2015, 2008, 2013, 2012, 2017, 2011, 2016, 2008, …
+## $ SIC             &lt;chr&gt; &quot;7372&quot;, &quot;7372&quot;, &quot;7370&quot;, &quot;7370&quot;, &quot;3845&quot;, &quot;3845&quot;, &quot;2834&quot;…
+## $ TOTALASSETS     &lt;dbl&gt; 97.175, 134.266, 2208.900, 4308.400, 0.616, 0.021, 329…
+## $ COSTOFGOODSSOLD &lt;dbl&gt; 31.703, 45.019, 152.800, 110.900, 0.008, 0.100, 4722.0…
+## $ NETINCOME       &lt;dbl&gt; 5.704, 8.128, 356.200, 247.400, -0.554, -0.488, 3709.0…
+## $ SALE            &lt;dbl&gt; 75.276, 102.873, 2171.900, 2312.200, 0.250, 0.006, 212…
+## $ ADVERTISING     &lt;dbl&gt; 1.500, 2.100, 27.600, 15.600, 0.000, 0.000, 957.000, 7…
+## $ SELLINGADMIN    &lt;dbl&gt; 33.928, 42.396, 1475.600, 1723.900, 0.637, 0.201, 8942…
+## $ MKTVALUE        &lt;dbl&gt; 162.1399, 277.5604, 9464.5000, 8693.5680, 8.9599, 12.4…
+## $ COMMONEQUITY    &lt;dbl&gt; 72.280, 92.926, 1230.500, 2043.200, -1.219, -3.298, 15…
+## $ TOTALLIABILITY  &lt;dbl&gt; 24.895, 41.340, 978.400, 2265.200, 1.770, 3.254, 17103…</code></pre>
+<pre class="r"><code>ggplot(x=top_5_industries$SIC,y=top_5_industries$COMPANYNAME)+
+geom_bar(stat = &quot;identity&quot;)+
+labs(x = &quot;SIC&quot;,
+y = &quot;Companies&quot;,
+title = &quot;Top 5 Industries&quot;
+)</code></pre>
+<p><img src="/posts/data-analysis-tidyverse_files/figure-html/unnamed-chunk-4-1.png" width="672" />
+Question 4
+The dataset for alphabet inc shows that its located in Delaware,ticker is google, total assets,COGS,NI,sales,market value,common equity, and total liability increased over the years. After making the scatter plot i found how that the sales and net income of the google dataset has a linear relationship with one outlier.</p>
+<pre class="r"><code>GOOGL=df %&gt;%
+  filter(
+    COMPANYNAME == &quot;ALPHABET INC&quot;
+  )
+glimpse(GOOGL)</code></pre>
+<pre><code>## Rows: 10
+## Columns: 14
+## $ COMPANYNAME     &lt;chr&gt; &quot;ALPHABET INC&quot;, &quot;ALPHABET INC&quot;, &quot;ALPHABET INC&quot;, &quot;ALPHA…
+## $ STATEINCORP     &lt;chr&gt; &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, …
+## $ TICKER          &lt;chr&gt; &quot;GOOGL&quot;, &quot;GOOGL&quot;, &quot;GOOGL&quot;, &quot;GOOGL&quot;, &quot;GOOGL&quot;, &quot;GOOGL&quot;, …
+## $ YEAR            &lt;dbl&gt; 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, …
+## $ SIC             &lt;chr&gt; &quot;7370&quot;, &quot;7370&quot;, &quot;7370&quot;, &quot;7370&quot;, &quot;7370&quot;, &quot;7370&quot;, &quot;7370&quot;…
+## $ TOTALASSETS     &lt;dbl&gt; 31767.58, 40496.78, 57851.00, 72574.00, 93798.00, 1109…
+## $ COSTOFGOODSSOLD &lt;dbl&gt; 7129.569, 7337.885, 9036.000, 11351.000, 17633.000, 21…
+## $ NETINCOME       &lt;dbl&gt; 4226.858, 6520.448, 8505.000, 9737.000, 10737.000, 129…
+## $ SALE            &lt;dbl&gt; 21795.55, 23650.56, 29321.00, 37905.00, 50175.00, 5982…
+## $ ADVERTISING     &lt;dbl&gt; 266.4, 353.4, 772.0, 1544.0, 2332.0, 2848.0, 3004.0, 3…
+## $ SELLINGADMIN    &lt;dbl&gt; 6446.975, 6467.962, 8523.000, 12475.000, 16284.000, 19…
+## $ MKTVALUE        &lt;dbl&gt; 96944.82, 197012.28, 190843.15, 209849.68, 233420.55, …
+## $ COMMONEQUITY    &lt;dbl&gt; 28238.86, 36004.22, 46241.00, 58145.00, 71715.00, 8730…
+## $ TOTALLIABILITY  &lt;dbl&gt; 3528.713, 4492.554, 11610.000, 14429.000, 22083.000, 2…</code></pre>
+<pre class="r"><code>plot(GOOGL$SALE,GOOGL$NETINCOME,pch=16,col=(&quot;red&quot;))</code></pre>
+<p><img src="/posts/data-analysis-tidyverse_files/figure-html/unnamed-chunk-5-1.png" width="672" />
+Question 5
+Target and walmart netincome and sales doesnt have a relationship. Target looks to be more static in their NI and walmart seems to fluctuate no matter what their sales and NI are in the years of 2008 to 2017. Walmart does keep a higher income over the years compared to 2008.</p>
+<pre class="r"><code>Target_dataset = df %&gt;% 
+  filter(
+    COMPANYNAME == (&quot;TARGET CORP&quot;) 
+  )
+glimpse(Target_dataset)</code></pre>
+<pre><code>## Rows: 10
+## Columns: 14
+## $ COMPANYNAME     &lt;chr&gt; &quot;TARGET CORP&quot;, &quot;TARGET CORP&quot;, &quot;TARGET CORP&quot;, &quot;TARGET C…
+## $ STATEINCORP     &lt;chr&gt; &quot;MN&quot;, &quot;MN&quot;, &quot;MN&quot;, &quot;MN&quot;, &quot;MN&quot;, &quot;MN&quot;, &quot;MN&quot;, &quot;MN&quot;, &quot;MN&quot;, …
+## $ TICKER          &lt;chr&gt; &quot;TGT&quot;, &quot;TGT&quot;, &quot;TGT&quot;, &quot;TGT&quot;, &quot;TGT&quot;, &quot;TGT&quot;, &quot;TGT&quot;, &quot;TGT&quot;…
+## $ YEAR            &lt;dbl&gt; 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, …
+## $ SIC             &lt;chr&gt; &quot;5331&quot;, &quot;5331&quot;, &quot;5331&quot;, &quot;5331&quot;, &quot;5331&quot;, &quot;5331&quot;, &quot;5331&quot;…
+## $ TOTALASSETS     &lt;dbl&gt; 44560, 44106, 44533, 43705, 46630, 48163, 44553, 41404…
+## $ COSTOFGOODSSOLD &lt;dbl&gt; 41895, 44157, 44062, 46585, 48306, 51035, 51160, 51278…
+## $ NETINCOME       &lt;dbl&gt; 2849, 2214, 2488, 2920, 2929, 2999, 1971, -1636, 3363,…
+## $ SALE            &lt;dbl&gt; 63367, 64948, 65357, 67390, 69865, 73301, 72596, 72618…
+## $ ADVERTISING     &lt;dbl&gt; 1195, 1233, 1167, 1292, 1360, 1422, 1668, 1600, 1434, …
+## $ SELLINGADMIN    &lt;dbl&gt; 14541, 14563, 14599, 13469, 14106, 14914, 15241, 14449…
+## $ MKTVALUE        &lt;dbl&gt; 45374.46, 23484.61, 38177.90, 38602.40, 34006.78, 3898…
+## $ COMMONEQUITY    &lt;dbl&gt; 15307, 13712, 15347, 15487, 15821, 16558, 16231, 13997…
+## $ TOTALLIABILITY  &lt;dbl&gt; 29253, 30394, 29186, 28218, 30809, 31605, 28322, 27407…</code></pre>
+<pre class="r"><code>plot(Target_dataset$SALE,Target_dataset$NETINCOME,pch=16,col=(&quot;red&quot;))</code></pre>
+<p><img src="/posts/data-analysis-tidyverse_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<pre class="r"><code>Walmart_dataset = df %&gt;% 
+  filter(
+    COMPANYNAME==(&quot;WALMART INC&quot;) 
+  )
+glimpse(Walmart_dataset)</code></pre>
+<pre><code>## Rows: 10
+## Columns: 14
+## $ COMPANYNAME     &lt;chr&gt; &quot;WALMART INC&quot;, &quot;WALMART INC&quot;, &quot;WALMART INC&quot;, &quot;WALMART …
+## $ STATEINCORP     &lt;chr&gt; &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, …
+## $ TICKER          &lt;chr&gt; &quot;WMT&quot;, &quot;WMT&quot;, &quot;WMT&quot;, &quot;WMT&quot;, &quot;WMT&quot;, &quot;WMT&quot;, &quot;WMT&quot;, &quot;WMT&quot;…
+## $ YEAR            &lt;dbl&gt; 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, …
+## $ SIC             &lt;chr&gt; &quot;5331&quot;, &quot;5331&quot;, &quot;5331&quot;, &quot;5331&quot;, &quot;5331&quot;, &quot;5331&quot;, &quot;5331&quot;…
+## $ TOTALASSETS     &lt;dbl&gt; 163514, 163429, 170706, 180663, 193406, 203105, 204751…
+## $ COSTOFGOODSSOLD &lt;dbl&gt; 280295, 299419, 297500, 307646, 326997, 343987, 349199…
+## $ NETINCOME       &lt;dbl&gt; 12731, 13400, 14335, 16389, 15699, 16999, 16022, 16363…
+## $ SALE            &lt;dbl&gt; 375376, 402298, 406103, 420016, 444948, 467231, 474259…
+## $ ADVERTISING     &lt;dbl&gt; 2000, 2300, 2400, 2500, 2300, 2300, 2400, 2400, 2500, …
+## $ SELLINGADMIN    &lt;dbl&gt; 70297, 76299, 79347, 81020, 85199, 88716, 90920, 92996…
+## $ MKTVALUE        &lt;dbl&gt; 201590.0, 184946.0, 202286.0, 197142.1, 209728.5, 2318…
+## $ COMMONEQUITY    &lt;dbl&gt; 64608, 65285, 70749, 68542, 71315, 76343, 76255, 81394…
+## $ TOTALLIABILITY  &lt;dbl&gt; 96967, 95953, 97470, 109008, 117241, 120848, 121921, 1…</code></pre>
+<pre class="r"><code>plot(Walmart_dataset$SALE,Walmart_dataset$NETINCOME,pch=16,col=(&quot;blue&quot;))</code></pre>
+<p><img src="/posts/data-analysis-tidyverse_files/figure-html/unnamed-chunk-6-2.png" width="672" />
+Question 6
+1-800-flowers.com has the highest ROA</p>
+<pre class="r"><code>GROSSPROFIT&lt;-df$SALE-df$COSTOFGOODSSOLD
+ROA&lt;-df$NETINCOME/df$TOTALASSETS
+ROE&lt;-df$NETINCOME/df$COMMONEQUITY
+GPMARGIN&lt;-GROSSPROFIT/df$SALE
+NPMARGIN&lt;-df$NETINCOME/df$SALE
+company_2008=df %&gt;% 
+  filter(
+    YEAR == &quot;2008&quot;
+  )
+glimpse(company_2008)</code></pre>
+<pre><code>## Rows: 691
+## Columns: 14
+## $ COMPANYNAME     &lt;chr&gt; &quot;AMERICAN AIRLINES GROUP INC&quot;, &quot;CECO ENVIRONMENTAL COR…
+## $ STATEINCORP     &lt;chr&gt; &quot;DE&quot;, &quot;DE&quot;, &quot;GA&quot;, &quot;CT&quot;, &quot;NV&quot;, &quot;DE&quot;, &quot;GA&quot;, &quot;DE&quot;, &quot;MA&quot;, …
+## $ TICKER          &lt;chr&gt; &quot;AAL&quot;, &quot;CECE&quot;, &quot;PRG&quot;, &quot;ACU&quot;, &quot;BKTI&quot;, &quot;ALK&quot;, &quot;AMSWA&quot;, &quot;…
+## $ YEAR            &lt;dbl&gt; 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2008, 2008, …
+## $ SIC             &lt;chr&gt; &quot;4512&quot;, &quot;3564&quot;, &quot;6141&quot;, &quot;3420&quot;, &quot;3663&quot;, &quot;4512&quot;, &quot;7372&quot;…
+## $ TOTALASSETS     &lt;dbl&gt; 25175.000, 120.017, 1233.270, 45.424, 30.622, 4835.600…
+## $ COSTOFGOODSSOLD &lt;dbl&gt; 20232.000, 172.874, 309.737, 40.054, 9.721, 3176.100, …
+## $ NETINCOME       &lt;dbl&gt; -2071.000, 5.010, 90.189, 4.467, -1.626, -135.900, 6.5…
+## $ SALE            &lt;dbl&gt; 23766.000, 217.890, 1592.608, 68.719, 19.175, 3620.300…
+## $ ADVERTISING     &lt;dbl&gt; 153.0000, 0.9850, 28.5000, 1.1595, 0.4100, 14.0000, 2.…
+## $ SELLINGADMIN    &lt;dbl&gt; 3024.000, 33.645, 664.080, 20.778, 12.119, 370.000, 36…
+## $ MKTVALUE        &lt;dbl&gt; 2976.3858, 34.6617, 1389.3320, 23.5682, 9.9241, 1061.0…
+## $ COMMONEQUITY    &lt;dbl&gt; -2935.000, 44.513, 761.544, 22.888, 26.244, 661.900, 8…
+## $ TOTALLIABILITY  &lt;dbl&gt; 28110.000, 75.504, 471.726, 22.536, 4.378, 4173.700, 2…</code></pre>
+<pre class="r"><code>company_2008 %&gt;% 
+  group_by(COMPANYNAME) %&gt;% 
+  reframe(ROA) %&gt;% 
+  arrange(ROA)</code></pre>
+<pre><code>## # A tibble: 4,774,810 × 2
+##    COMPANYNAME                    ROA
+##    &lt;chr&gt;                        &lt;dbl&gt;
+##  1 1-800-FLOWERS.COM             -Inf
+##  2 3D SYSTEMS CORP               -Inf
+##  3 3M CO                         -Inf
+##  4 8X8 INC                       -Inf
+##  5 A V HOMES INC                 -Inf
+##  6 AAON INC                      -Inf
+##  7 ABAXIS INC                    -Inf
+##  8 ACACIA DIVERSIFIED HLDGS INC  -Inf
+##  9 ACCO BRANDS CORP              -Inf
+## 10 ACCURAY INC                   -Inf
+## # … with 4,774,800 more rows</code></pre>
+<p>Question 7
+The top 3 companies that have the highest Net profits are Alaska Air Group Inc, ALLEGIANT TRAVEL CO, and AMERICAN AIRLINES GROUP INC.</p>
+<pre class="r"><code>transportation_dataset= df %&gt;% 
+  filter(
+    SIC==(&quot;4512&quot;) 
+  )
+glimpse(transportation_dataset)</code></pre>
+<pre><code>## Rows: 70
+## Columns: 14
+## $ COMPANYNAME     &lt;chr&gt; &quot;AMERICAN AIRLINES GROUP INC&quot;, &quot;AMERICAN AIRLINES GROU…
+## $ STATEINCORP     &lt;chr&gt; &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, …
+## $ TICKER          &lt;chr&gt; &quot;AAL&quot;, &quot;AAL&quot;, &quot;AAL&quot;, &quot;AAL&quot;, &quot;AAL&quot;, &quot;AAL&quot;, &quot;AAL&quot;, &quot;AAL&quot;…
+## $ YEAR            &lt;dbl&gt; 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, …
+## $ SIC             &lt;chr&gt; &quot;4512&quot;, &quot;4512&quot;, &quot;4512&quot;, &quot;4512&quot;, &quot;4512&quot;, &quot;4512&quot;, &quot;4512&quot;…
+## $ TOTALASSETS     &lt;dbl&gt; 25175.0, 25438.0, 25088.0, 23848.0, 23510.0, 42278.0, …
+## $ COSTOFGOODSSOLD &lt;dbl&gt; 20232.0, 16935.0, 18138.0, 20420.0, 20529.0, 19084.0, …
+## $ NETINCOME       &lt;dbl&gt; -2071.0, -1468.0, -471.0, -1979.0, -1876.0, -1834.0, 2…
+## $ SALE            &lt;dbl&gt; 23766.0, 19917.0, 22170.0, 24022.0, 24855.0, 26712.0, …
+## $ ADVERTISING     &lt;dbl&gt; 153.0, 153.0, 165.0, 186.0, 153.0, 166.0, 100.0, 110.0…
+## $ SELLINGADMIN    &lt;dbl&gt; 3024.0, 2720.0, 2729.0, 2907.0, 2892.0, 4672.0, 6554.0…
+## $ MKTVALUE        &lt;dbl&gt; 2976.3858, 2571.1835, 2597.5755, 117.3438, 266.5571, 6…
+## $ COMMONEQUITY    &lt;dbl&gt; -2935.0, -3489.0, -3945.0, -7111.0, -7987.0, -2731.0, …
+## $ TOTALLIABILITY  &lt;dbl&gt; 28110.0, 28927.0, 29033.0, 30959.0, 31497.0, 45009.0, …</code></pre>
+<pre class="r"><code>transportation_dataset %&gt;% 
+  group_by(COMPANYNAME) %&gt;% 
+  reframe(NPMARGIN) %&gt;% 
+  arrange(NPMARGIN)</code></pre>
+<pre><code>## # A tibble: 48,370 × 2
+##    COMPANYNAME          NPMARGIN
+##    &lt;chr&gt;                   &lt;dbl&gt;
+##  1 ALASKA AIR GROUP INC     -Inf
+##  2 ALASKA AIR GROUP INC     -Inf
+##  3 ALASKA AIR GROUP INC     -Inf
+##  4 ALASKA AIR GROUP INC     -Inf
+##  5 ALASKA AIR GROUP INC     -Inf
+##  6 ALASKA AIR GROUP INC     -Inf
+##  7 ALASKA AIR GROUP INC     -Inf
+##  8 ALASKA AIR GROUP INC     -Inf
+##  9 ALASKA AIR GROUP INC     -Inf
+## 10 ALASKA AIR GROUP INC     -Inf
+## # … with 48,360 more rows</code></pre>
+<p>Question 8
+The mean of total assets is higher than the mean of sales in pfizer inc and johnson &amp; johnson. These boxplots show pfizer inc having a higher avg of total assets than johnson &amp; johnson company. On the other hand, johnson &amp; johnson has a higher sales avg compared to pfizer inc.</p>
+<pre class="r"><code>boxplot_data=df %&gt;% 
+  filter(
+    COMPANYNAME==c(&quot;PFIZER INC&quot;,&quot;JOHNSON &amp; JOHNSON&quot; ) 
+  )
+pfizer_box=df %&gt;% 
+  filter(
+    COMPANYNAME==(&quot;PFIZER INC&quot;) 
+  )
+johnson_box=df %&gt;% 
+  filter(
+    COMPANYNAME==(&quot;JOHNSON &amp; JOHNSON&quot;) 
+  )
+boxplot.default(pfizer_box$TOTALASSETS,pfizer_box$SALE)</code></pre>
+<p><img src="/posts/data-analysis-tidyverse_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<pre class="r"><code>boxplot.default(johnson_box$TOTALASSETS,johnson_box$SALE)</code></pre>
+<p><img src="/posts/data-analysis-tidyverse_files/figure-html/unnamed-chunk-9-2.png" width="672" /></p>
+<pre class="r"><code>glimpse(boxplot_data)</code></pre>
+<pre><code>## Rows: 10
+## Columns: 14
+## $ COMPANYNAME     &lt;chr&gt; &quot;JOHNSON &amp; JOHNSON&quot;, &quot;JOHNSON &amp; JOHNSON&quot;, &quot;JOHNSON &amp; J…
+## $ STATEINCORP     &lt;chr&gt; &quot;NJ&quot;, &quot;NJ&quot;, &quot;NJ&quot;, &quot;NJ&quot;, &quot;NJ&quot;, &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, &quot;DE&quot;, …
+## $ TICKER          &lt;chr&gt; &quot;JNJ&quot;, &quot;JNJ&quot;, &quot;JNJ&quot;, &quot;JNJ&quot;, &quot;JNJ&quot;, &quot;PFE&quot;, &quot;PFE&quot;, &quot;PFE&quot;…
+## $ YEAR            &lt;dbl&gt; 2009, 2011, 2013, 2015, 2017, 2008, 2010, 2012, 2014, …
+## $ SIC             &lt;chr&gt; &quot;2834&quot;, &quot;2834&quot;, &quot;2834&quot;, &quot;2834&quot;, &quot;2834&quot;, &quot;2834&quot;, &quot;2834&quot;…
+## $ TOTALASSETS     &lt;dbl&gt; 94682, 113644, 132683, 133411, 157303, 111148, 195014,…
+## $ COSTOFGOODSSOLD &lt;dbl&gt; 15560, 17115, 18238, 17709, 18987, 4783, 12441, 8600, …
+## $ NETINCOME       &lt;dbl&gt; 12266, 9672, 13831, 15409, 1300, 8104, 8257, 14570, 91…
+## $ SALE            &lt;dbl&gt; 61897, 65030, 71312, 70074, 76450, 48341, 67791, 58986…
+## $ ADVERTISING     &lt;dbl&gt; 2400, 2600, 2500, 2500, 2500, 2600, 4000, 2900, 3100, …
+## $ SELLINGADMIN    &lt;dbl&gt; 26787, 28503, 30013, 30249, 31974, 21633, 28796, 23809…
+## $ MKTVALUE        &lt;dbl&gt; 177405.8, 178663.7, 258341.3, 283010.2, 374802.4, 1194…
+## $ COMMONEQUITY    &lt;dbl&gt; 50588, 57080, 74053, 71150, 60160, 57483, 87761, 81221…
+## $ TOTALLIABILITY  &lt;dbl&gt; 44094, 56564, 58630, 62261, 97143, 53408, 106749, 1041…</code></pre>
+<pre class="r"><code>boxplot(boxplot_data$TOTALASSETS,boxplot_data$SALE)</code></pre>
+<p><img src="/posts/data-analysis-tidyverse_files/figure-html/unnamed-chunk-9-3.png" width="672" />
+Question 9
+Theres no reltionship between the advertising expenses and the sales. There are a few outliers, but overall the more thats spent on advertising does not affect the companies sales.</p>
+<pre class="r"><code>plot.default(df$ADVERTISING,df$SALE,pch=16,col=(&quot;blue&quot;))</code></pre>
+<p><img src="/posts/data-analysis-tidyverse_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<pre class="r"><code>plot.default(df$SALE,df$ADVERTISING,pch=16,col=(&quot;blue&quot;))</code></pre>
+<p><img src="/posts/data-analysis-tidyverse_files/figure-html/unnamed-chunk-10-2.png" width="672" />
+Question 10
+Delaware has the most amount of companies</p>
+<pre class="r"><code>df %&gt;%
+  count(STATEINCORP,sort = TRUE)</code></pre>
+<pre><code>## # A tibble: 32 × 2
+##    STATEINCORP     n
+##    &lt;chr&gt;       &lt;int&gt;
+##  1 DE           4360
+##  2 NV            340
+##  3 MN            200
+##  4 FL            170
+##  5 OH            160
+##  6 WA            140
+##  7 NY            130
+##  8 WI            120
+##  9 MD            110
+## 10 CA            100
+## # … with 22 more rows</code></pre>
